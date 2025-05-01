@@ -430,6 +430,7 @@
                     <input type="text" placeholder="検索...">
                 </div>
                 <div class="contacts-scroll">
+                    <!-- 会話一覧 -->
                     <div class="contact-item active" data-id="1">
                         <div class="contact-avatar">田</div>
                         <div class="contact-info">
@@ -484,6 +485,7 @@
                 </div>
                 
                 <div class="messages-container">
+                    <!-- チャットメッセージ -->
                     <div class="message message-incoming">
                         <div class="message-bubble">
                             山田さん、こんにちは！次回のレッスンに向けて楽譜をお送りします。
@@ -589,7 +591,7 @@
                         toggleMessages.classList.add('hidden');
                     }
                     
-                    // チャットデータ更新（実際のアプリでは非同期処理などが入る）
+                    // チャットデータ更新
                     updateChatView(this.getAttribute('data-id'));
                 });
             });
@@ -601,7 +603,7 @@
             function sendMessage() {
                 const messageText = messageInput.value.trim();
                 if (messageText) {
-                    // メッセージを追加（実際のアプリではサーバーに送信）
+                    // メッセージを追加
                     addMessage(messageText, 'outgoing');
                     messageInput.value = '';
                     
@@ -643,12 +645,13 @@
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
             
-            // チャットビュー更新関数（実際のアプリではAPIからデータ取得など）
+            // チャットビュー更新関数（各連絡先に対応したチャットデータ）
             function updateChatView(contactId) {
-                // この関数は実際の実装では連絡先IDに基づいてチャット履歴を取得・表示
-                console.log(`連絡先ID ${contactId} のチャットを表示`);
+                // メッセージコンテナをリセット
+                const messagesContainer = document.querySelector('.messages-container');
+                messagesContainer.innerHTML = '';
                 
-                // デモでは単純にヘッダー情報を更新
+                // ヘッダー情報を更新
                 const contactItem = document.querySelector(`.contact-item[data-id="${contactId}"]`);
                 if (contactItem) {
                     const avatarText = contactItem.querySelector('.contact-avatar').textContent;
@@ -657,6 +660,53 @@
                     document.querySelector('.chat-header .contact-avatar').textContent = avatarText;
                     document.querySelector('.chat-header .contact-name').textContent = contactName;
                 }
+                
+                // ID に基づいてメッセージを表示
+                if (contactId === "1") {
+                    // 田中先生との会話
+                    addPredefinedMessage("山田さん、こんにちは！次回のレッスンに向けて楽譜をお送りします。", "incoming", "10:15");
+                    addPredefinedMessage("特に16ページから18ページを重点的に練習してみてください。トリルの部分を丁寧に練習しておきましょう。", "incoming", "10:18");
+                    addPredefinedMessage("田中先生、ありがとうございます。楽譜拝見しました。トリルの練習頑張ります！", "outgoing", "10:25");
+                    addPredefinedMessage("分からないことがあればいつでも質問してくださいね。次回のレッスンも楽しみにしています。", "incoming", "10:30");
+                } else if (contactId === "2") {
+                    // 鈴木先生との会話
+                    addPredefinedMessage("本日はレッスンお疲れ様でした。基本フォームが良くなってきていますね。", "incoming", "昨日");
+                    addPredefinedMessage("ありがとうございます。アドバイスいただいたコード進行も練習してみます。", "outgoing", "昨日");
+                    addPredefinedMessage("お疲れ様でした。練習頑張ってください！", "incoming", "昨日");
+                } else if (contactId === "3") {
+                    // 佐藤先生との会話
+                    addPredefinedMessage("山田さん、次回のレッスンですが、予定変更があり、通常の時間に対応できなくなってしまいました。", "incoming", "月曜日");
+                    addPredefinedMessage("別の日時で調整可能でしょうか？", "incoming", "月曜日");
+                    addPredefinedMessage("了解しました。来週の水曜日か金曜日であれば大丈夫です。", "outgoing", "月曜日");
+                    addPredefinedMessage("次回のレッスン日程の調整をお願いします", "incoming", "月曜日");
+                } else if (contactId === "4") {
+                    // 中村先生との会話
+                    addPredefinedMessage("山田さん、来月の発表会の曲目が決まりました。「Amazing Grace」を歌っていただこうと思います。", "incoming", "先週");
+                    addPredefinedMessage("わかりました！楽しみにしています。練習頑張ります。", "outgoing", "先週");
+                    addPredefinedMessage("発表会の曲目が決まりました", "incoming", "先週");
+                }
+                
+                // スクロールを最下部に移動
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // 事前定義されたメッセージを追加する関数
+            function addPredefinedMessage(text, type, time) {
+                const messagesContainer = document.querySelector('.messages-container');
+                const message = document.createElement('div');
+                message.className = `message message-${type}`;
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                bubble.textContent = text;
+                
+                const timeElement = document.createElement('div');
+                timeElement.className = 'message-time';
+                timeElement.textContent = time;
+                
+                message.appendChild(bubble);
+                message.appendChild(timeElement);
+                messagesContainer.appendChild(message);
             }
             
             // 送信ボタンクリック時の処理
