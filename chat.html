@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music School - チャットルーム</title>
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --success: #38b000;
+            --warning: #ffbe0b;
+            --danger: #ff006e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--gray);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .nav-item {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            color: var(--dark);
+            text-decoration: none;
+        }
+        
+        .nav-item.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .nav-item:hover {
+            background-color: var(--light);
+        }
+        
+        .chat-container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 200px);
+            min-height: 500px;
+        }
+        
+        .chat-sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-title {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .chat-status {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid var(--gray);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--gray);
+            border-radius: 20px;
+            font-size: 16px;
+            resize: none;
+            max-height: 120px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .send-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .send-button:hover {
+            background-color: #2a75e8;
+        }
+        
+        .message {
+            max-width: 75%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            position: relative;
+            word-break: break-word;
+        }
+        
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .message-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .message-sender {
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        
+        .message-time {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .message-outgoing {
+            align-self: flex-end;
+            background-color: #dcf8c6;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-incoming {
+            align-self: flex-start;
+            background-color: #f0f0f0;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        
+        .search-container {
+            padding: 0 0 15px 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .chat-item {
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .chat-item:hover, .chat-item.active {
+            background-color: var(--light);
+        }
+        
+        .chat-item.active {
+            border-left: 3px solid var(--primary);
+        }
+        
+        .chat-item-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .chat-item-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-item-last-message {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-item-time {
+            font-size: 11px;
+            color: #666;
+            align-self: flex-start;
+        }
+        
+        .unread-badge {
+            background-color: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+        
+        .files-button {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .emoji-button {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        .action-button {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        
+        .action-button:hover {
+            background-color: var(--light);
+        }
+        
+        .attachment-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .attachment {
+            padding: 5px 10px;
+            background-color: var(--light);
+            border-radius: 15px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .attachment-icon {
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        .attachment-name {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .typing-indicator {
+            padding: 10px;
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            height: 24px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .chat-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .new-chat-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .new-chat-button:hover {
+            background-color: #2a75e8;
+        }
+        
+        .filters-button {
+            background-color: var(--light);
+            border: 1px solid var(--gray);
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .filters-button:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* サイドバー切替ボタン（モバイル用） */
+        .toggle-sidebar {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* モバイル対応 */
+        @media (max-width: 768px) {
+            .chat-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .chat-sidebar {
+                width: 100%;
+                margin-bottom: 15px;
+                height: 300px;
+                display: none;
+            }
+            
+            .chat-sidebar.visible {
+                display: flex;
+            }
+            
+            .chat-main {
+                height: calc(100vh - 300px);
+            }
+            
+            .toggle-sidebar {
+                display: flex;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .navigation {
+                overflow-x: auto;
+                white-space: nowrap;
+                display: flex;
+                flex-wrap: nowrap;
+            }
+            
+            .nav-item {
+                flex: 0 0 auto;
+                padding: 15px 20px;
+            }
+            
+            .chat-header {
+                padding: 10px;
+            }
+            
+            .chat-title {
+                font-size: 16px;
+            }
+            
+            .chat-input-container {
+                padding: 10px;
+            }
+        }
+        
+        /* 特に小さい画面用 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 15px 0;
+                margin-bottom: 15px;
+            }
+            
+            .user-menu span {
+                display: none;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 10px 12px;
+            }
+            
+            .chat-input {
+                padding: 10px;
+            }
+            
+            .send-button {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .chat-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Music School</div>
+            <div class="user-menu">
+                <span>山田太郎</span>
+                <div class="user-avatar">山</div>
+            </div>
+        </header>
+        
+        <div class="navigation">
+            <a href="index.html" class="nav-item">レッスン予約</a>
+            <a href="#" class="nav-item active">チャット</a>
+            <a href="#" class="nav-item">マイページ</a>
+            <a href="#" class="nav-item">お知らせ</a>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-sidebar visible" id="chat-sidebar">
+                <div class="chat-controls">
+                    <button class="new-chat-button">
+                        <i>＋</i> 新規チャット
+                    </button>
+                    <button class="filters-button">
+                        <i>≡</i>
+                    </button>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="チャットを検索...">
+                </div>
+                
+                <div class="chat-list">
+                    <div class="chat-item active">
+                        <div class="message-avatar" style="background-color: #3a86ff;">田</div>
+                        <div class="chat-item-info">
+                            <div class="chat-item-name">田中先生（ピアノ）</div>
+                            <div class="chat-item-last-message">次回のレッスンについて詳細をお知らせします</div>
+                        </div>
+                        <div class="chat-item-time">13:45</div>
+                    </div>
+                    
+                    <div class="chat-item">
+                        <div class="message-avatar" style="background-color: #ff006e;">鈴</div>
+                        <div class="chat-item-info">
+                            <div class="chat-item-name">鈴木先生（ギター）</div>
+                            <div class="chat-item-last-message">課題の進捗はいかがですか？</div>
+                        </div>
+                        <div class="chat-item-time">昨日</div>
+                    </div>
+                    
+                    <div class="chat-item">
+                        <div class="message-avatar" style="background-color: #ffbe0b;">佐</div>
+                        <div class="chat-item-info">
+                            <div class="chat-item-name">佐藤先生（バイオリン）</div>
+                            <div class="chat-item-last-message">レッスン日程の変更について</div>
+                        </div>
+                        <div class="chat-item-time">月曜日</div>
+                    </div>
+                    
+                    <div class="chat-item">
+                        <div class="message-avatar" style="background-color: #8338ec;">中</div>
+                        <div class="chat-item-info">
+                            <div class="chat-item-name">中村先生（ボーカル）<span class="unread-badge">3</span></div>
+                            <div class="chat-item-last-message">発声練習の動画を送りました</div>
+                        </div>
+                        <div class="chat-item-time">04/18</div>
+                    </div>
+                    
+                    <div class="chat-item">
+                        <div class="message-avatar" style="background-color: #38b000;">事</div>
+                        <div class="chat-item-info">
+                            <div class="chat-item-name">事務局</div>
+                            <div class="chat-item-last-message">5月のお休みについてご連絡いたします</div>
+                        </div>
+                        <div class="chat-item-time">04/16</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-main">
+                <div class="chat-header">
+                    <div>
+                        <div class="chat-title">田中先生（ピアノ）</div>
+                        <div class="chat-status">オンライン</div>
+                    </div>
+                    <div>
+                        <button class="action-button">
+                            <i>…</i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message-container">
+                        <div class="message-info">
+                            <div class="message-avatar" style="background-color: #3a86ff;">田</div>
+                            <div class="message-sender">田中先生</div>
+                            <div class="message-time">2025/04/20 10:15</div>
+                        </div>
+                        <div class="message message-incoming">
+                            山田さん、こんにちは！次回のレッスンについて詳細をお知らせします。4月24日（木）10:00からの予定です。先週の課題曲についての進捗はいかがでしょうか？
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info" style="justify-content: flex-end;">
+                            <div class="message-sender">山田太郎</div>
+                            <div class="message-time">2025/04/20 10:20</div>
+                        </div>
+                        <div class="message message-outgoing">
+                            田中先生、こんにちは！レッスンの詳細ありがとうございます。課題曲は毎日30分ほど練習しています。ただ、32小節目からの部分でつまずいています。
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info">
+                            <div class="message-avatar" style="background-color: #3a86ff;">田</div>
+                            <div class="message-sender">田中先生</div>
+                            <div class="message-time">2025/04/20 10:25</div>
+                        </div>
+                        <div class="message message-incoming">
+                            練習お疲れ様です！32小節目は確かに技術的に難しい部分ですね。その部分だけを取り出して、ゆっくりとしたテンポで練習してみてください。左手と右手を別々に練習することも効果的です。
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info">
+                            <div class="message-avatar" style="background-color: #3a86ff;">田</div>
+                            <div class="message-sender">田中先生</div>
+                            <div class="message-time">2025/04/20 10:27</div>
+                        </div>
+                        <div class="message message-incoming">
+                            参考になる演奏動画を見つけましたので、シェアします。この部分の演奏に注目してください。
+                            <div class="attachment-container">
+                                <div class="attachment">
+                                    <span class="attachment-icon">📹</span>
+                                    <span class="attachment-name">piano_tutorial.mp4</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info" style="justify-content: flex-end;">
+                            <div class="message-sender">山田太郎</div>
+                            <div class="message-time">2025/04/20 10:35</div>
+                        </div>
+                        <div class="message message-outgoing">
+                            アドバイスありがとうございます！動画も参考になります。早速今日から実践してみます。また進捗があればご報告します。
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info">
+                            <div class="message-avatar" style="background-color: #3a86ff;">田</div>
+                            <div class="message-sender">田中先生</div>
+                            <div class="message-time">2025/04/20 10:40</div>
+                        </div>
+                        <div class="message message-incoming">
+                            素晴らしいです！焦らずじっくり練習していきましょう。何か質問があればいつでもメッセージしてください。次回のレッスンが楽しみです！
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info" style="justify-content: flex-end;">
+                            <div class="message-sender">山田太郎</div>
+                            <div class="message-time">2025/04/21 18:45</div>
+                        </div>
+                        <div class="message message-outgoing">
+                            先生、今日練習してみました！少しずつですが弾けるようになってきました。録音したのでよかったら聞いてください。まだ完璧ではないですが...
+                            <div class="attachment-container">
+                                <div class="attachment">
+                                    <span class="attachment-icon">🎵</span>
+                                    <span class="attachment-name">practice_20250421.mp3</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info">
+                            <div class="message-avatar" style="background-color: #3a86ff;">田</div>
+                            <div class="message-sender">田中先生</div>
+                            <div class="message-time">2025/04/21 19:30</div>
+                        </div>
+                        <div class="message message-incoming">
+                            山田さん、録音聞かせていただきました！昨日よりずいぶん良くなっていますね。特に33小節目からのフレージングが自然になってきています。この調子で頑張りましょう！
+                        </div>
+                    </div>
+                    
+                    <div class="message-container">
+                        <div class="message-info" style="justify-content: flex-end;">
+                            <div class="message-sender">山田太郎</div>
+                            <div class="message-time">2025/04/21 19:45</div>
+                        </div>
+                        <div class="message message-outgoing">
+                            励ましのお言葉ありがとうございます！もっと練習して次回のレッスンに備えます。
+                        </div>
+                    </div>
+                    
+                    <div class="typing-indicator" id="typing-indicator">
+                        <!-- タイピングインジケーター -->
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <button class="files-button">📎</button>
+                    <button class="emoji-button">😊</button>
+                    <textarea class="chat-input" id="chat-input" placeholder="メッセージを入力..." rows="1"></textarea>
+                    <button class="send-button" id="send-button">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="toggle-sidebar" id="toggle-sidebar">💬</button>
