@@ -531,6 +531,46 @@ window.addEventListener('resize', function() {
     }, 250); // 250ミリ秒の遅延を設定
 });
 
+// スケジュールグリッドの生成が失敗した場合のフォールバック関数
+function createTimeHeader() {
+    const header = document.createElement('div');
+    header.className = 'hour-label';
+    header.textContent = '';
+    return header;
+}
+
+// 日付ヘッダーを生成する関数
+function createDayHeader(date) {
+    const header = document.createElement('div');
+    header.className = 'day-header';
+    
+    const dayCode = getDayCodeFromDate(date);
+    const dayName = dayMapping[dayCode];
+    
+    // 月/日 (曜)の形式で表示
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    if (window.innerWidth <= 480) {
+        header.innerHTML = `${day}<br>(${dayName})`;
+    } else {
+        header.textContent = `${month}/${day} (${dayName})`;
+    }
+    
+    return header;
+}
+
+// 楽器名を取得する関数（フィルタリング用）
+function getInstrumentName(code) {
+    const instrumentMap = {
+        'piano': 'ピアノ',
+        'guitar': 'ギター',
+        'violin': 'バイオリン',
+        'vocal': 'ボーカル'
+    };
+    return instrumentMap[code] || code;
+}
+
 // 初期化処理
 document.addEventListener('DOMContentLoaded', function() {
     // 現在の日付から最も近い月曜日を計算して初期表示
@@ -544,8 +584,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // 週の表示を更新
     updateWeekDisplay();
     
-    // 初期スケジュールを表示
-    document.getElementById('search-button').click();
+    // 初期スケジュール表示
+    updateSchedule('all', 'all', 'all');
+    
+    // 検索結果表示エリアを表示
+    document.getElementById('search-results').style.display = 'block';
+    document.getElementById('result-count').textContent = getFilteredSlots('all', 'all', 'all').length;
     
     // モバイルビューの場合、フィルターを最初は非表示にする
     if (window.innerWidth <= 768) {
