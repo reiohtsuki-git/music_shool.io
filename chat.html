@@ -343,6 +343,10 @@
             cursor: pointer;
         }
         
+        .hidden {
+            display: none !important;
+        }
+        
         @media (max-width: 768px) {
             .chat-container {
                 flex-direction: column;
@@ -353,14 +357,6 @@
                 flex: none;
                 width: 100%;
                 height: 500px;
-            }
-            
-            .contacts-list.hidden {
-                display: none;
-            }
-            
-            .chat-content.hidden {
-                display: none;
             }
             
             .mobile-toggle {
@@ -584,3 +580,100 @@
                     
                     // クリックされた連絡先をアクティブに
                     this.classList.add('active');
+                    
+                    // モバイルビューの場合、チャット表示に切り替え
+                    if (window.innerWidth <= 768) {
+                        contactsList.classList.add('hidden');
+                        chatContent.classList.remove('hidden');
+                        toggleContacts.classList.remove('hidden');
+                        toggleMessages.classList.add('hidden');
+                    }
+                    
+                    // チャットデータ更新（実際のアプリでは非同期処理などが入る）
+                    updateChatView(this.getAttribute('data-id'));
+                });
+            });
+            
+            // メッセージ送信処理
+            const messageInput = document.querySelector('.message-input');
+            const sendButton = document.querySelector('.send-button');
+            
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (messageText) {
+                    // メッセージを追加（実際のアプリではサーバーに送信）
+                    addMessage(messageText, 'outgoing');
+                    messageInput.value = '';
+                    
+                    // スクロールを最下部に移動
+                    const messagesContainer = document.querySelector('.messages-container');
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // デモ用：自動返信
+                    setTimeout(() => {
+                        addMessage('メッセージを受け取りました。ありがとうございます。', 'incoming');
+                    }, 1000);
+                }
+            }
+            
+            // メッセージ追加関数
+            function addMessage(text, type) {
+                const messagesContainer = document.querySelector('.messages-container');
+                const message = document.createElement('div');
+                message.className = `message message-${type}`;
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                bubble.textContent = text;
+                
+                const time = document.createElement('div');
+                time.className = 'message-time';
+                
+                // 現在時刻を取得
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                time.textContent = `${hours}:${minutes}`;
+                
+                message.appendChild(bubble);
+                message.appendChild(time);
+                messagesContainer.appendChild(message);
+                
+                // スクロールを最下部に移動
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // チャットビュー更新関数（実際のアプリではAPIからデータ取得など）
+            function updateChatView(contactId) {
+                // この関数は実際の実装では連絡先IDに基づいてチャット履歴を取得・表示
+                console.log(`連絡先ID ${contactId} のチャットを表示`);
+                
+                // デモでは単純にヘッダー情報を更新
+                const contactItem = document.querySelector(`.contact-item[data-id="${contactId}"]`);
+                if (contactItem) {
+                    const avatarText = contactItem.querySelector('.contact-avatar').textContent;
+                    const contactName = contactItem.querySelector('.contact-name').textContent;
+                    
+                    document.querySelector('.chat-header .contact-avatar').textContent = avatarText;
+                    document.querySelector('.chat-header .contact-name').textContent = contactName;
+                }
+            }
+            
+            // 送信ボタンクリック時の処理
+            sendButton.addEventListener('click', sendMessage);
+            
+            // Enter キーで送信
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // 初期表示時のスクロール位置調整
+            const messagesContainer = document.querySelector('.messages-container');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+    </script>
+</body>
+</html>
